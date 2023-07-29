@@ -1,14 +1,11 @@
 package mychess.domen;
 
-public class Queen extends Figure {
+public class Queen extends GameObject {
 
-    public Queen(int locationX,int locationY, char side, String imagePath) {
+    public Queen(int locationX,int locationY, int side, String imagePath) {
         super(locationX, locationY, imagePath);
         this.side = side;
     }
 
-    @Override
-    protected void moveToMouse(int mouseX, int mouseY) {
-        super.moveToMouse(mouseX, mouseY);
-    }
+
 }

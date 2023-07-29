@@ -1,14 +1,13 @@
 package mychess.domen;
 
-public class Elephant extends Figure {
+public class Elephant extends GameObject {
 
-    public Elephant(int locationX, int locationY, char side, String imagePath) {
+    public Elephant(int locationX, int locationY, int side, String imagePath) {
         super(locationX, locationY, imagePath);
         this.side = side;
     }
 
     @Override
-    protected void moveToMouse(int mouseX, int mouseY) {
-        super.moveToMouse(mouseX, mouseY);
+    public void move() {
     }
 }
