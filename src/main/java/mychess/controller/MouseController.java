@@ -1,92 +1,128 @@
 package mychess.controller;
 
-import mychess.configuration.Configuration;
 import mychess.domen.GameObject;
 import mychess.domen.King;
+import mychess.domen.Pawn;
 import mychess.domen.Player;
 import mychess.service.GameMaster;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
-import javax.swing.*;
 
-public class MouseController extends MouseAdapter implements ActionListener {
+public class MouseController extends MouseInputAdapter {
 
-    private Timer timer;
 
     private final Player player;
     private final GameMaster gameMaster;
-    private MouseEvent em;
     private GameObject g;
     private int firstYPosition;
     private int firstXPosition;
+    private boolean bBeginDrag = false;
 
     public MouseController(Player player) {
         this.player = player;
         this.gameMaster = GameMaster.getInstance();
+        //this.addMouseListener(this);
+        //this.addMouseMotionListener(this);
     }
-
 
     @Override
     public void mousePressed(MouseEvent e) {
-        int goX = (int) (e.getX() / 64.0);
-        int goY = (int) (e.getY() / 64.0);
-        em = e;
-        gameMaster.getGameObjects().stream().filter(g -> g.getLocationX() + 1 == goX && g.getLocationY() + 1 == goY).findFirst().ifPresent(g ->{
-            this.g = g;
+        int goX = (int) Math.ceil((e.getX() - 64) / 64.0);
+        int goY = (int) Math.ceil((e.getY() - 64) / 64.0);
+        GameObject gameObject = gameMaster
+                .getGameObjects().stream()
+                .filter(g -> g.getLocationX() == goX && g.getLocationY() == goY).findFirst().orElse(null);
+        if(gameObject != null) {
+            this.g = gameObject;
+            bBeginDrag = true;
             firstXPosition = g.getLocationX();
             firstYPosition = g.getLocationY();
-            timer = new Timer(100, this);
             gameMaster.getGameObjects().remove(g);
             gameMaster.addDynamicObject(g);
-            timer.start();
-        });
+            g.move();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if(g != null) {
-            g.move();
-            HashMap<Integer, Integer> moves = g.getMoves();
-            for (Integer y : moves.keySet()) {
-                if (y == (int) Math.ceil(e.getY() / 64.0) && moves.get(y) == (int) Math.ceil(e.getX() / 64.0)) {
-                    for (GameObject gm : gameMaster.getGameObjects()) {
-                        if (y == gm.getLocationY() && moves.get(y) == gm.getLocationX()) {
-                            if (gm.getSide() != g.getSide()) {
-                                if (!(gm instanceof King)) {
-                                    gameMaster.getGameObjects().remove(gm);
-                                    g.setLocationY(y);
-                                    g.setLocationX(moves.get(y));
-                                    timer.stop();
-                                    break;
-                                }
-                            }
-                        } else {
-                            g.setLocationY(y);
-                            g.setLocationX(moves.get(y));
-                            gameMaster.deleteDynamicObject();
-                            gameMaster.getGameObjects().add(g);
-                            timer.stop();
-                            break;
-                        }
+            bBeginDrag = false;
+            int x = (int) Math.ceil((e.getX() - 64) / 64.0);
+            int y = (int) Math.ceil((e.getY() - 64) / 64.0);
+
+            if (canMove(x, y)) {
+                if (haveFigureOnField(x, y)) {
+                    if (canTakeFigure(x, y)) {
+                        g.setLocationY(y);
+                        g.setLocationX(x);
+                        if(g instanceof Pawn && ((Pawn) g).firstMove) ((Pawn) g).firstMove = false;
+                        gameMaster.deleteGameObject(gameMaster.findGameObject(x, y));
+                        gameMaster.deleteDynamicObject();
+                        gameMaster.getGameObjects().add(g);
+                        g.getMoves().clear();
+                        g = null;
+                        return;
                     }
+                }else {
+                    g.setLocationY(y);
+                    g.setLocationX(x);
+                    if (g instanceof Pawn && ((Pawn) g).firstMove) ((Pawn) g).firstMove = false;
+                    gameMaster.deleteDynamicObject();
+                    gameMaster.getGameObjects().add(g);
+                    g.getMoves().clear();
+                    g = null;
+                    return;
                 }
             }
-            g.setLocationX(firstXPosition);
-            g.setLocationY(firstYPosition);
             gameMaster.deleteDynamicObject();
             gameMaster.getGameObjects().add(g);
+            g.setLocationX(firstXPosition);
+            g.setLocationY(firstYPosition);
+            g.getMoves().clear();
+            g = null;
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        g.setLocationX(em.getX() - 42);
-        g.setLocationY(em.getY() - 42);
+    private boolean canMove(int imX, int imY){
+        if(g != null){
+            for(Float y : g.getMoves().keySet()){
+                if (y.intValue() == imY && g.getMoves().get(y) == imX){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
+    private boolean haveFigureOnField(int imX, int imY){
+        for(GameObject gm : gameMaster.getGameObjects()){
+            if(imY == gm.getLocationY() && imX == gm.getLocationX()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean canTakeFigure(int x, int y){
+        GameObject gameObject = gameMaster.findGameObject(x, y);
+        if(gameObject.getSide() == g.getSide()){
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (!bBeginDrag || (e.getX() > 64*9 || e.getY() > 64*9)) return;
+        g.setLocationX(e.getX() - 32);
+        g.setLocationY(e.getY() - 60);
+
+    }
 
 }

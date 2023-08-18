@@ -2,7 +2,7 @@ package mychess.configuration;
 
 public interface Configuration {
     String GAME_NAME = "Chess";
-    int GAME_FRAMES_PER_SECOND = 60;
+    int GAME_FRAMES_PER_SECOND = 10;
     Integer WHITE_FIELD = 0;
     Integer BLACK_FIELD = 1;
     String FILE_BLACK_FIELD = "src/main/resources/board/черный_квадрат.png";

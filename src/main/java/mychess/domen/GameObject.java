@@ -9,12 +9,11 @@ import java.util.List;
 import static mychess.configuration.Configuration.*;
 
 public class GameObject {
-
     protected int side;
     private final Image image;
     protected int locationX;
     protected int locationY;
-    protected HashMap<Integer, Integer> moves = new HashMap<>();
+    protected HashMap<Float, Integer> moves = new HashMap<>();
 
     public GameObject(int locationX, int locationY, String imagePath){
         this.locationX = locationX;
@@ -25,18 +24,12 @@ public class GameObject {
     public void move(){}
 
     public void render(Graphics graphics) {
-        graphics.drawImage(image, locationX * SPRITE_SIZE + 64, locationY * SPRITE_SIZE + 64, null);
+        graphics.drawImage(image, locationX * SPRITE_SIZE, locationY * SPRITE_SIZE, null);
     }
     public void render1(Graphics graphics) {
         graphics.drawImage(image, locationX, locationY, null);
     }
 
-    public void render1(Graphics graphics, HashMap<Integer, Integer> moves) {
-        graphics.drawImage(image, locationX, locationY, null);
-        for(Integer y : moves.keySet()){
-            graphics.drawImage(image, moves.get(y), y, null);
-        }
-    }
     public void setLocationX(int locationX) {
         this.locationX = locationX;
     }
@@ -53,11 +46,13 @@ public class GameObject {
         return locationY;
     }
 
-    public HashMap<Integer, Integer> getMoves() {
+    public HashMap<Float, Integer> getMoves() {
         return moves;
     }
 
     public int getSide() {
         return side;
     }
+
+
 }

@@ -20,7 +20,11 @@ public class GameFrame extends JPanel implements ActionListener {
         gameMaster.setGameFrame(this);
         frame.setLocationRelativeTo(null);
         timer.start();
-        frame.addMouseListener(new MouseController(gameMaster.getPlayer()));
+
+        MouseController mouseController = new MouseController(gameMaster.getPlayer());
+        frame.addMouseListener(mouseController);
+        frame.addMouseMotionListener(mouseController);
+
     }
 
     public void timerStop(){

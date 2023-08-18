@@ -1,6 +1,7 @@
 package mychess;
 
 import mychess.configuration.Configuration;
+import mychess.controller.MouseController;
 
 import javax.swing.*;
 import java.awt.*;
