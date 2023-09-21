@@ -7,6 +7,7 @@ public interface Configuration {
     Integer BLACK_FIELD = 1;
     String FILE_BLACK_FIELD = "src/main/resources/board/черный_квадрат.png";
     String FILE_WHITE_FIELD = "src/main/resources/board/белый_квадрат.jpg";
+    String FILE_BLUE_CIRCLE = "src/main/resources/board/синий_круг.png";
     Integer SPRITE_SIZE = 64;
     String FILE_WHITE_ROOK = "src/main/resources/figures/белая_ладья.png";
     String FILE_WHITE_PAWN = "src/main/resources/figures/белая_пешка.png";
